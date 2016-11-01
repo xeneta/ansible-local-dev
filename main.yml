@@ -1,0 +1,6 @@
+---
+
+- name: Setup packages on servers
+  hosts: all
+  roles:
+    - common

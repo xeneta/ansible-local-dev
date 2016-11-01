@@ -1,0 +1,11 @@
+---
+
+- name: Configure default locale file
+  template: src=etc.default.locale.j2 dest=/etc/default/locale
+  register: default_locale
+  tags: locale
+
+- name: Generate Locale
+  when: default_locale | changed
+  shell: locale-gen en_US.UTF-8
+  tags: locale

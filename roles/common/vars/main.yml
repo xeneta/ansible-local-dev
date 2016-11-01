@@ -1,0 +1,15 @@
+---
+
+packages:
+  - apt-transport-https
+  - colordiff
+  - git-core
+  - htop
+  - mtr-tiny
+  - nano
+  - psmisc
+  - rsync
+  - strace
+  - sysstat
+  - vim
+
