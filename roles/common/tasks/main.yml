@@ -1,7 +1,7 @@
 ---
 
 - include: locale.yml
-- include: ntp.yml
 - include: packages.yml
+- include: ntp.yml
 
 
