@@ -1,11 +1,11 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-HOSTS_FILE="$DIR/hosts"
+INVENTORY_FILE="$DIR/inventory"
 ID_RSA_FILE="$DIR/id_rsa"
 OVERRIDE_VARS_FILE="$DIR/vars.yml"
-SITE_FILE="$DIR/../main.yml"
-HOSTS=$(grep '\.ans\.local' $DIR/hosts | grep -v ';' | sort | uniq)
+PLAYBOOK_FILE="$DIR/../playbook.yml"
+TARGETS=$(grep '\.ans\.local' $INVENTORY_FILE | grep -v ';' | sort | uniq)
 IP_PREFIX="192.168.200"
 DOCKER_IMAGE_NAME="ansible_local_test"
 
@@ -15,7 +15,7 @@ cleanup_test_ips() {
 	grep -v "$IP_PREFIX" /etc/hosts | sudo tee /etc/hosts 1>/dev/null
 
 	counter=1
-	for host in $HOSTS
+	for host in $TARGETS
 	do
 		ip="$IP_PREFIX.$((counter++))"
 		sudo ifconfig lo0 -alias "$ip" 2>/dev/null
@@ -29,7 +29,7 @@ setup_test_ips() {
 
 	echo "Setting up ips and hosts for test containers..."
 	counter=1
-	for host in $HOSTS
+	for host in $TARGETS
 	do
 		ip="$IP_PREFIX.$((counter++))"
 		sudo ifconfig lo0 alias "$ip"
@@ -51,12 +51,12 @@ start_containers() {
 	links=""
 	counter=1
 
-	for host in $HOSTS
+	for host in $TARGETS
 	do
 		docker rm -f "$host" &>/dev/null
 	done
 
-	for host in $HOSTS
+	for host in $TARGETS
 	do
 		ip="$IP_PREFIX.$((counter++))"
 		docker run \
@@ -73,12 +73,12 @@ start_containers() {
 run_ansible() {
 	ANSIBLE_HOST_KEY_CHECKING=False \
 		ansible-playbook \
-		--inventory-file="$HOSTS_FILE" \
+		--inventory-file="$INVENTORY_FILE" \
 		--user=root \
 		--private-key="$ID_RSA_FILE" \
-		--inventory-file="$HOSTS_FILE" \
+		--inventory-file="$INVENTORY_FILE" \
 		--extra-vars="@$OVERRIDE_VARS_FILE" \
-		"$SITE_FILE"
+		"$PLAYBOOK_FILE"
 }
 
 
